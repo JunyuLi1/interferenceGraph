@@ -4,6 +4,8 @@
 #include <stdexcept>
 #include <string>
 #include <unordered_set>
+#include <unordered_map>
+
 
 namespace shindler::ics46::project6 {
 
@@ -66,7 +68,8 @@ class InterferenceGraph {
     [[nodiscard]] unsigned degree(const T &vertex) const;
 
    private:
-    // Private member variables here.
+    std::unordered_map<T, std::unordered_set<T>> graphNodes;
+    unsigned numberedge;
 };
 
 template <typename T>
@@ -81,59 +84,136 @@ InterferenceGraph<T>::~InterferenceGraph() {
 
 template <typename T>
 std::unordered_set<T> InterferenceGraph<T>::neighbors(const T &vertex) const {
-    // TODO: Implement this
-    return {};
+    std::unordered_set<T> result;
+    for(const auto & pair:graphNodes)
+    {
+        if(pair.first == vertex)
+        {
+            result = pair.second;
+        }
+    }
+    if(result.empty())
+    {
+        throw UnknownVertexException(vertex);
+    }
+    return result;
 }
 
 template <typename T>
 std::unordered_set<T> InterferenceGraph<T>::vertices() const noexcept {
-    // TODO: Implement this
-    return {};
+    std::unordered_set<T> result;
+    for(const auto & pair:graphNodes)
+    {
+        result.insert(pair.first);
+    }
+    return result;
 }
 
 template <typename T>
 unsigned InterferenceGraph<T>::numVertices() const noexcept {
-    // TODO: Implement this
-    return {};
+    return graphNodes.size();
 }
 
 template <typename T>
 unsigned InterferenceGraph<T>::numEdges() const noexcept {
-    // TODO: Implement this
-    return {};
+    return numberedge;
 }
 
 template <typename T>
 void InterferenceGraph<T>::addEdge(const T &source, const T &destination) {
-    // TODO: Implement this
+    if(graphNodes.find(source)== graphNodes.end())
+    {
+        throw UnknownVertexException(source);
+    }
+    if(graphNodes.find(destination)== graphNodes.end())
+    {
+        throw UnknownVertexException(destination);
+    }
+    graphNodes[source].insert(destination);
+    graphNodes[destination].insert(source);
+    numberedge++;
 }
 
 template <typename T>
 void InterferenceGraph<T>::removeEdge(const T &source, const T &destination) {
-    // TODO: Implement this
+    if(graphNodes.find(source)== graphNodes.end())
+    {
+        throw UnknownVertexException(source);
+    }
+    if(graphNodes.find(destination)== graphNodes.end())
+    {
+        throw UnknownVertexException(destination);
+    }
+    if(graphNodes[source].find(destination)== graphNodes[source].end())
+    {
+        throw UnknownEdgeException(source, destination);
+    }
+    graphNodes[source].erase(destination);
+    graphNodes[destination].erase(source);
+    numberedge--;
 }
 
 template <typename T>
 void InterferenceGraph<T>::addVertex(const T &vertex) {
-    // TODO: Implement this
+    graphNodes[vertex];
 }
 
 template <typename T>
 void InterferenceGraph<T>::removeVertex(const T &vertex) {
-    // TODO: Implement this
+    auto vertexfind = graphNodes.find(vertex);
+    if(vertexfind== graphNodes.end())
+    {
+        throw UnknownVertexException(vertex);
+    }
+    graphNodes.erase(vertex);
+    for(const auto& pairs: graphNodes)
+    {
+        if(pairs.second.find(vertex)!=pairs.second.end())
+        {
+            pairs.second.erase(vertex);
+            numberedge--; //here
+        }
+    }
 }
 
 template <typename T>
 bool InterferenceGraph<T>::interferes(const T &source,
                                       const T &destination) const {
-    // TODO: Implement this
-    return {};
+    bool condition = false;
+    if(graphNodes.find(source)== graphNodes.end())
+    {
+        throw UnknownVertexException(source);
+    }
+    if(graphNodes.find(destination)== graphNodes.end())
+    {
+        throw UnknownVertexException(destination);
+    }
+    for(const auto&pairs:graphNodes)
+    {
+        if(pairs.first==source)
+        {
+            condition = true;
+        }
+    }
+    return condition;
 }
 
 template <typename T>
 unsigned InterferenceGraph<T>::degree(const T &vertex) const {
-    // TODO: Implement this
-    return {};
+    unsigned numdegreee = 0;
+    auto vertexfind = graphNodes.find(vertex);
+    if(vertexfind== graphNodes.end())
+    {
+        throw UnknownVertexException(vertex);
+    }
+    for(const auto&pairs:graphNodes)
+    {
+        if(pairs.first==vertex)
+        {
+            numdegreee = pairs.second.size();
+        }
+    }
+    return numdegreee;
 }
 
 }  // namespace shindler::ics46::project6
