@@ -69,7 +69,7 @@ class InterferenceGraph {
 
    private:
     std::unordered_map<T, std::unordered_set<T>> graphNodes;
-    unsigned numberedge;
+    unsigned numberedge = 0;
 };
 
 template <typename T>
@@ -84,19 +84,10 @@ InterferenceGraph<T>::~InterferenceGraph() {
 
 template <typename T>
 std::unordered_set<T> InterferenceGraph<T>::neighbors(const T &vertex) const {
-    std::unordered_set<T> result;
-    for(const auto & pair:graphNodes)
-    {
-        if(pair.first == vertex)
-        {
-            result = pair.second;
-        }
-    }
-    if(result.empty())
-    {
+    if (graphNodes.count(vertex) == 0){
         throw UnknownVertexException(vertex);
     }
-    return result;
+    return graphNodes.at(vertex);
 }
 
 template <typename T>
@@ -121,12 +112,10 @@ unsigned InterferenceGraph<T>::numEdges() const noexcept {
 
 template <typename T>
 void InterferenceGraph<T>::addEdge(const T &source, const T &destination) {
-    if(graphNodes.find(source)== graphNodes.end())
-    {
+    if (graphNodes.count(source) == 0){
         throw UnknownVertexException(source);
     }
-    if(graphNodes.find(destination)== graphNodes.end())
-    {
+    if(graphNodes.count(destination) == 0){
         throw UnknownVertexException(destination);
     }
     graphNodes[source].insert(destination);
@@ -136,16 +125,13 @@ void InterferenceGraph<T>::addEdge(const T &source, const T &destination) {
 
 template <typename T>
 void InterferenceGraph<T>::removeEdge(const T &source, const T &destination) {
-    if(graphNodes.find(source)== graphNodes.end())
-    {
+    if (graphNodes.count(source) == 0){
         throw UnknownVertexException(source);
     }
-    if(graphNodes.find(destination)== graphNodes.end())
-    {
+    if(graphNodes.count(destination) == 0){
         throw UnknownVertexException(destination);
     }
-    if(graphNodes[source].find(destination)== graphNodes[source].end())
-    {
+    if (graphNodes[source].count(destination) == 0){
         throw UnknownEdgeException(source, destination);
     }
     graphNodes[source].erase(destination);
@@ -160,9 +146,7 @@ void InterferenceGraph<T>::addVertex(const T &vertex) {
 
 template <typename T>
 void InterferenceGraph<T>::removeVertex(const T &vertex) {
-    auto vertexfind = graphNodes.find(vertex);
-    if(vertexfind== graphNodes.end())
-    {
+    if (graphNodes.count(vertex) == 0){
         throw UnknownVertexException(vertex);
     }
     graphNodes.erase(vertex);
@@ -179,41 +163,21 @@ void InterferenceGraph<T>::removeVertex(const T &vertex) {
 template <typename T>
 bool InterferenceGraph<T>::interferes(const T &source,
                                       const T &destination) const {
-    bool condition = false;
-    if(graphNodes.find(source)== graphNodes.end())
-    {
+    if (graphNodes.count(source) == 0){
         throw UnknownVertexException(source);
     }
-    if(graphNodes.find(destination)== graphNodes.end())
-    {
+    if(graphNodes.count(destination) == 0){
         throw UnknownVertexException(destination);
     }
-    for(const auto&pairs:graphNodes)
-    {
-        if(pairs.first==source)
-        {
-            condition = true;
-        }
-    }
-    return condition;
+    return graphNodes.at(source).count(destination) == 1;
 }
 
 template <typename T>
 unsigned InterferenceGraph<T>::degree(const T &vertex) const {
-    unsigned numdegreee = 0;
-    auto vertexfind = graphNodes.find(vertex);
-    if(vertexfind== graphNodes.end())
-    {
+     if (graphNodes.count(vertex) == 0){
         throw UnknownVertexException(vertex);
     }
-    for(const auto&pairs:graphNodes)
-    {
-        if(pairs.first==vertex)
-        {
-            numdegreee = pairs.second.size();
-        }
-    }
-    return numdegreee;
+    return graphNodes.at(vertex).size();
 }
 
 }  // namespace shindler::ics46::project6

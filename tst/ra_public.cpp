@@ -38,4 +38,14 @@ TEST_CASE("SimpleFail", "[Required][RA]") {
     REQUIRE((allocation.empty()));
 }
 
+TEST_CASE("complete_1k_registers", "[Extra][RA]") {
+    // Load the graph pointed to by simple.csv
+    const auto &GRAPH = GRAPH_DIR + "complete_1000.csv";
+    const auto NUM_REGS = 1000;
+    const auto &allocation = proj6::assignRegisters(GRAPH, NUM_REGS);
+    proj6::IGWriter::write(proj6::CSVReader::load(GRAPH),
+                           GRAPH_DIR + "simple_success.dot", allocation);
+    REQUIRE((verifyAllocation(GRAPH, NUM_REGS, allocation)));
+}
+
 }  // namespace

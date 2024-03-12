@@ -29,4 +29,10 @@ TEST_CASE("Neighbors", "[Required][IG]") {
     REQUIRE(igraph.neighbors("x") == expected_neighbors);
 }
 
+TEST_CASE("RuntimeTest", "[ig-complete_1000]") {
+const auto &GRAPH = GRAPH_DIR + "complete_1000.csv";
+proj6::InterferenceGraph<proj6::Variable> igraph =
+proj6::CSVReader::load(GRAPH);
+}
+
 }  // namespace
