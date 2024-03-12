@@ -150,7 +150,7 @@ void InterferenceGraph<T>::removeVertex(const T &vertex) {
         throw UnknownVertexException(vertex);
     }
     graphNodes.erase(vertex);
-    for(const auto& pairs: graphNodes)
+    for(auto& pairs: graphNodes)
     {
         if(pairs.second.find(vertex)!=pairs.second.end())
         {

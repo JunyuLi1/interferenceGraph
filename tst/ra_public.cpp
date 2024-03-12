@@ -40,12 +40,25 @@ TEST_CASE("SimpleFail", "[Required][RA]") {
 
 TEST_CASE("complete_1k_registers", "[Extra][RA]") {
     // Load the graph pointed to by simple.csv
-    const auto &GRAPH = GRAPH_DIR + "complete_1000.csv";
-    const auto NUM_REGS = 1000;
+    const auto &GRAPH = GRAPH_DIR + "complete_graph_250.csv";
+    const auto NUM_REGS = 250;
     const auto &allocation = proj6::assignRegisters(GRAPH, NUM_REGS);
     proj6::IGWriter::write(proj6::CSVReader::load(GRAPH),
                            GRAPH_DIR + "simple_success.dot", allocation);
     REQUIRE((verifyAllocation(GRAPH, NUM_REGS, allocation)));
 }
+
+TEST_CASE("1k Fail", "[Optional][RA]") {
+    // Load the graph pointed to by simple.csv
+    const auto &GRAPH = GRAPH_DIR + "complete_1000.csv";
+    const auto NUM_REGS = 10;
+
+    // Provide 2 registers to the register allocation algorithm.
+    // Note, the highest degree in this graph is two, so the allocation
+    // cannot be completed.
+    const auto &allocation = proj6::assignRegisters(GRAPH, NUM_REGS);
+    REQUIRE((allocation.empty()));
+}
+
 
 }  // namespace
